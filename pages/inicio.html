@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - UTS Plataforma Académica</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png">
+    <meta property="og:title" content="UTS Enterprise Inicio">
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
+            </div>
+            <ul class="nav-menu">
+                <div class="nav-group-label">MENÚ PRINCIPAL</div>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link active"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
+                <li class="nav-item"><a href="proyectos.html" class="nav-link"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
+                <li class="nav-item"><a href="cursos.html" class="nav-link"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
+                
+                <div class="nav-group-label" style="margin-top: 30px;">AUDITORÍA</div>
+                <li class="nav-item"><a href="reportes.html" class="nav-link"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
+                <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar proyectos, recursos...">
+                </div>
+                <div class="top-nav-actions">
+                    <div class="notif-badge">
+                        <i class="far fa-bell"></i>
+                        <span class="dot-notif"></span>
+                    </div>
+                    <div class="user-profile-header">
+                        <div class="user-meta">
+                            <span id="userName" class="user-full-name">Estudiante UTS</span>
+                            <span id="userCareer" class="user-role">Ingeniería de Sistemas</span>
+                        </div>
+                        <div class="avatar-circle" id="userInitial" role="img" aria-label="Avatar del usuario">U</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-section reveal-animation">
+                <!-- Animated Hero Carousel -->
+                <section class="uts-hero-carousel">
+                    <div class="carousel-container" id="heroCarousel">
+                        <!-- Slide 1 -->
+                        <div class="hero-slide active">
+                            <div class="hero-content">
+                                <span class="hero-tag">COMUNIDAD UTS</span>
+                                <h1 class="hero-title">#SOYUTEISTA</h1>
+                                <p class="hero-subtitle">Gestiona tus proyectos y alcanza tu meta de graduación.</p>
+                                <a href="proyectos.html" class="btn-uts" style="width: auto; padding: 12px 25px; text-decoration: none; display: inline-block;">Ver Proyectos</a>
+                            </div>
+                            <div class="hero-image-overlay">
+                                <img src="uts_hero_banner_1777389585761.png" alt="Estudiantes UTS" class="hero-bg-img">
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="hero-slide">
+                            <div class="hero-content">
+                                <span class="hero-tag" style="background: var(--uts-blue);">NUEVO</span>
+                                <h1 class="hero-title">Catálogo Oficial</h1>
+                                <p class="hero-subtitle">Descubre los nuevos cursos disponibles para fortalecer tus habilidades.</p>
+                                <a href="cursos.html" class="btn-uts" style="width: auto; padding: 12px 25px; text-decoration: none; display: inline-block;">Explorar Cursos</a>
+                            </div>
+                            <div class="hero-image-overlay">
+                                <img src="uts_hero_banner_1777389585761.png" alt="Cursos UTS" class="hero-bg-img" style="filter: hue-rotate(45deg);">
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="hero-slide">
+                            <div class="hero-content">
+                                <span class="hero-tag" style="background: #ef4444;">IMPORTANTE</span>
+                                <h1 class="hero-title">Auditoría 2026</h1>
+                                <p class="hero-subtitle">Genera tu reporte consolidado para presentar a coordinación.</p>
+                                <a href="reportes.html" class="btn-uts" style="width: auto; padding: 12px 25px; text-decoration: none; display: inline-block;">Generar Reporte</a>
+                            </div>
+                            <div class="hero-image-overlay">
+                                <img src="uts_hero_banner_1777389585761.png" alt="Reportes UTS" class="hero-bg-img" style="filter: grayscale(0.5);">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stats Section -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon blue"><i class="fas fa-bullseye"></i></div>
+                        <div>
+                            <span class="kpi-count">52</span>
+                            <span class="kpi-title">Proyectos Requeridos</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon green"><i class="fas fa-check"></i></div>
+                        <div>
+                            <span class="kpi-count" id="statCompleted">0</span>
+                            <span class="kpi-title">Completados</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon yellow"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <span class="kpi-count" id="statPending">52</span>
+                            <span class="kpi-title">Pendientes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graduation Progress -->
+                <section class="progress-container">
+                    <div class="progress-header">
+                        <h3 style="color: var(--uts-blue);">Progreso de Graduación</h3>
+                        <span id="progressPctText" style="font-weight: 700; color: var(--uts-green);">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 14px; color: var(--uts-text-muted);">
+                        Sigue avanzando para alcanzar tus objetivos académicos.
+                    </p>
+                </section>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="mobile-bottom-nav">
+            <a href="dashboard.html" class="mobile-nav-item active">
+                <i class="fas fa-grid-2"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="proyectos.html" class="mobile-nav-item">
+                <i class="fas fa-layer-group"></i>
+                <span>Proyectos</span>
+            </a>
+            <a href="cursos.html" class="mobile-nav-item">
+                <i class="fas fa-book-open"></i>
+                <span>Cursos</span>
+            </a>
+            <a href="reportes.html" class="mobile-nav-item">
+                <i class="fas fa-file-invoice"></i>
+                <span>Reportes</span>
+            </a>
+            <a href="configuracion.html" class="mobile-nav-item">
+                <i class="fas fa-sliders-h"></i>
+                <span>Ajustes</span>
+            </a>
+        </nav>
+    </div>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+      }
+    }
+    </script>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>

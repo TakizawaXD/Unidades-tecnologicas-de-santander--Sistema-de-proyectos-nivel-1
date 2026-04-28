@@ -4,16 +4,15 @@
 
 Una plataforma web "Designer Grade" diseñada para los estudiantes de las Unidades Tecnológicas de Santander. Permite la gestión, seguimiento y auditoría de los 52 proyectos/requisitos académicos necesarios para la graduación.
 
-## ✨ Características Principales
+## ✨ Características Principales (App-like PWA)
 
 - **Diseño "Bento Grid" Premium**: Una interfaz de usuario limpia, profesional y moderna que utiliza el popular layout de cuadrícula estilo "Bento".
-- **Mobile-First Experience**: Navegación adaptada a dispositivos móviles con una barra inferior "Tab Bar" moderna (Glassmorphism), eliminando el obsoleto menú de hamburguesa.
+- **Progressive Web App (PWA)**: Navegación móvil nativa sin bordes, con gestos de arrastre prevenidos (`overscroll-behavior: none`), y barra superior "Sticky".
 - **Sincronización en Tiempo Real**: Desarrollado sobre Google Firebase (Firestore), los proyectos y datos de usuario se sincronizan al instante en todos los dispositivos conectados.
-- **Gestor de Proyectos**: Añade, categoriza y monitorea proyectos con cálculo dinámico de porcentajes de progreso.
+- **Tablero Kanban Interactivo**: Implementación nativa de `SortableJS` para gestión de proyectos mediante drag-and-drop sincronizado con la nube.
+- **Gráficas y Estadísticas**: Analítica avanzada de proyectos usando `Chart.js`.
+- **Generador de Certificados (PDF & QR)**: Emisión de reportes oficiales de grados en formato PDF automatizado con `jsPDF` y firmas digitales QR dinámicas.
 - **Catálogo Académico**: Visualización de cursos oficiales y certificaciones de vanguardia.
-- **Centro de Auditoría**: Área para la previsualización y futura generación de reportes consolidados en PDF.
-
-## 🚀 Prueba del Sistema (Modo Demo)
 
 Se ha habilitado un modo de prueba ("Bypass Auth") para que invitados puedan experimentar la plataforma sin necesidad de registrarse en la base de datos de Firebase.
 
@@ -40,17 +39,18 @@ Se ha habilitado un modo de prueba ("Bypass Auth") para que invitados puedan exp
 ```text
 /
 ├── index.html              # Página de presentación / Landing Page (Punto de entrada)
-├── login.html              # Pantalla de autenticación
-├── dashboard.html          # Vista General (Bento Grid Layout)
-├── proyectos.html          # Gestor CRUD de proyectos
-├── cursos.html             # Catálogo de formación continua
-├── reportes.html           # Centro de generación de PDFs
-├── configuracion.html      # Perfil de usuario y seguridad
-├── .env                    # Entorno (Ref para configuración Firebase)
+├── pages/
+│   ├── login.html          # Pantalla de autenticación y captura Firebase
+│   ├── register.html       # Registro extendido de estudiante
+│   ├── dashboard.html      # Vista General (Bento Grid, Chart.js, Gamificación)
+│   ├── proyectos.html      # Gestor Kanban de proyectos
+│   ├── cursos.html         # Catálogo de formación continua
+│   ├── reportes.html       # Centro de generación de PDFs y códigos QR
+│   └── configuracion.html  # Perfil de usuario y seguridad
 ├── css/
-│   └── style.css           # Sistema de diseño global (Design Tokens, Responsive)
+│   └── style.css           # Sistema de diseño global y mobile-first (PWA config)
 └── js/
-    ├── app.js              # Lógica de sincronización, Auth y UI dinámica
+    ├── app.js              # Core Logic (PDF, Kanban, Chats, Auth, Firestore)
     └── firebase-config.js  # Credenciales de conexión a Firebase
 ```
 

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - UTS Plataforma Institucional</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png">
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body class="auth-page">
+    <div class="auth-card" style="position: relative; overflow: hidden;">
+        <!-- decorative background -->
+        <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(0, 141, 62, 0.1); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -50px; left: -50px; width: 100px; height: 100px; background: rgba(0, 74, 135, 0.1); border-radius: 50%;"></div>
+
+        <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS Logo" class="auth-logo" style="position: relative; z-index: 1;">
+        <h1 style="position: relative; z-index: 1; font-weight: 800;">Únete a la Comunidad UTS</h1>
+        <p style="position: relative; z-index: 1;">Crea tu cuenta para gestionar tus proyectos académicos.</p>
+        
+        <form id="registerForm" style="position: relative; z-index: 1;">
+            <div class="form-group">
+                <label for="reg-name"><i class="fas fa-user"></i> Nombre Completo</label>
+                <input type="text" id="reg-name" placeholder="Tu nombre completo" autocomplete="name" required>
+            </div>
+            <div class="form-row" style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="reg-code"><i class="fas fa-id-card"></i> Código Estudiantil</label>
+                    <input type="text" id="reg-code" placeholder="Ej: 1005234" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="reg-email"><i class="fas fa-envelope"></i> Correo UTS</label>
+                    <input type="email" id="reg-email" placeholder="@uts.edu.co" autocomplete="email" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reg-career"><i class="fas fa-graduation-cap"></i> Programa Académico</label>
+                <select id="reg-career" required>
+                    <option value="" disabled selected>Selecciona tu programa...</option>
+                    <option value="Ingeniería de Sistemas">Ingeniería de Sistemas</option>
+                    <option value="Tecnología en Desarrollo de Software">Tecnología en Desarrollo de Software</option>
+                    <option value="Ingeniería Electrónica">Ingeniería Electrónica</option>
+                    <option value="Tecnología en Gestión Empresarial">Tecnología en Gestión Empresarial</option>
+                </select>
+            </div>
+            <div class="form-row" style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="reg-semester"><i class="fas fa-layer-group"></i> Semestre</label>
+                    <select id="reg-semester" required>
+                        <option value="1">1° Semestre</option>
+                        <option value="2">2° Semestre</option>
+                        <option value="3">3° Semestre</option>
+                        <option value="4">4° Semestre</option>
+                        <option value="5">5° Semestre</option>
+                        <option value="6">6° Semestre</option>
+                        <option value="7">7° Semestre</option>
+                        <option value="8">8° Semestre</option>
+                        <option value="9">9° Semestre</option>
+                        <option value="10">10° Semestre</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="reg-journey"><i class="fas fa-sun"></i> Jornada</label>
+                    <select id="reg-journey" required>
+                        <option value="Diurna">Diurna</option>
+                        <option value="Nocturna">Nocturna</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reg-pass"><i class="fas fa-lock"></i> Contraseña de Acceso</label>
+                <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required>
+            </div>
+            <button type="submit" class="btn-uts" style="margin-top: 10px; width: 100%;">Completar Registro</button>
+        </form>
+        
+        <div style="margin-top: 25px; font-size: 14px; position: relative; z-index: 1;">
+            <span style="color: var(--uts-text-muted);">¿Ya tienes cuenta?</span>
+            <a href="login.html" style="color: var(--uts-blue); font-weight: 700; text-decoration: none;">Inicia Sesión</a>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+      }
+    }
+    </script>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>

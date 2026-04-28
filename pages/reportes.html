@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes PDF - UTS Enterprise</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png">
+    
+    <!-- jsPDF and AutoTable for professional PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- QRCode for PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="mainSidebar">
+            <div class="sidebar-header" style="text-align: center;">
+                <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
+            </div>
+            <ul class="nav-menu">
+                <div class="nav-group-label">MENÚ PRINCIPAL</div>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
+                <li class="nav-item"><a href="proyectos.html" class="nav-link"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
+                <li class="nav-item"><a href="cursos.html" class="nav-link"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
+                <div class="nav-group-label" style="margin-top: 30px;">AUDITORÍA</div>
+                <li class="nav-item"><a href="reportes.html" class="nav-link active"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
+                <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Buscar reportes..."></div>
+                <div class="top-nav-actions"><div class="user-profile-header"><div class="user-meta"><span id="userName" class="user-full-name">Estudiante UTS</span><span id="userCareer" class="user-role">Ingeniería de Sistemas</span></div><div class="avatar-circle" id="userInitial" role="img" aria-label="Avatar del usuario">U</div></div></div>
+            </header>
+
+            <div class="dashboard-section reveal-animation">
+                <div class="page-title-area" style="margin-bottom: 40px;">
+                    <h1 class="premium-title">Centro de Auditoría</h1>
+                    <p class="premium-subtitle">Genera documentos oficiales con firma digital (QR) y trazabilidad completa.</p>
+                </div>
+                
+                <div class="bento-grid">
+                    <div class="bento-item" style="grid-column: span 6; background: linear-gradient(135deg, #0f172a 0%, var(--uts-blue-dark) 100%); color: white; padding: 40px;">
+                        <i class="fas fa-file-signature" style="font-size: 40px; color: var(--uts-green); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 10px;">Reporte de Grado Consolidado</h3>
+                        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; line-height: 1.6;">
+                            Genera un documento PDF oficial con el estado actual de tus 52 requisitos. Incluye un código QR único para validación por parte de Coordinación Académica.
+                        </p>
+                        <button id="btnGeneratePDF" class="btn-primary-glow" style="background: var(--uts-green); width: 100%;">
+                            <i class="fas fa-file-pdf" style="margin-right: 10px;"></i> Descargar PDF Oficial
+                        </button>
+                    </div>
+
+                    <div class="bento-item" style="grid-column: span 6; padding: 40px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;">
+                        <i class="fas fa-qrcode" style="font-size: 48px; color: var(--uts-text-muted); margin-bottom: 20px;"></i>
+                        <h3>Autenticidad Verificada</h3>
+                        <p style="color: var(--uts-text-muted); font-size: 14px;">El código QR generado en el documento enlaza directamente a tu perfil en Firestore, asegurando la inmutabilidad de tus proyectos.</p>
+                        <!-- Hidden div for QR generation -->
+                        <div id="qrcode" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="mobile-bottom-nav">
+            <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
+            <a href="proyectos.html" class="mobile-nav-item"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
+            <a href="cursos.html" class="mobile-nav-item"><i class="fas fa-book-open"></i><span>Cursos</span></a>
+            <a href="reportes.html" class="mobile-nav-item active"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
+            <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
+        </nav>
+    </div>
+    <script type="importmap">{"imports": {"firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js","firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"}}</script>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>
