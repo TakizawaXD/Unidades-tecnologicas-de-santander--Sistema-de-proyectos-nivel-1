@@ -1,26 +1,8 @@
-// UTS Platform - Firebase Integrated Logic (Zero-Latency Edition)
-import { auth, db } from './firebase-config.js';
 import { 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    updateProfile,
-    signOut,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { 
-    collection, 
-    query, 
-    where, 
-    onSnapshot, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
-    doc, 
-    getDoc,
-    setDoc,
-    orderBy,
-    serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    auth, db, 
+    signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged,
+    collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc, serverTimestamp, orderBy
+} from './firebase-config.js';
 
 const TOTAL_REQUIRED_PROJECTS = 52;
 
