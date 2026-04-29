@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let currentUser = JSON.parse(localStorage.getItem('uts_user'));
 
-    // --- 1. ZERO-LATENCY UI RENDER (Se ejecuta ANTES de descargar Firebase) ---
+    // --- 1. ZERO-LATENCY UI RENDER (INSTANTÁNEO) ---
     const isAppPage = ['dashboard.html', 'inicio.html', 'proyectos.html', 'cursos.html', 'reportes.html', 'configuracion.html'].some(p => window.location.pathname.includes(p));
     let currentPage = null;
     if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('inicio.html')) currentPage = 'dashboard';
@@ -50,7 +50,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.location.pathname.includes('reportes.html')) currentPage = 'reportes';
 
     if (isAppPage) {
-        if (!currentUser) return window.location.href = 'login.html';
+        if (!currentUser) {
+            console.warn("No hay usuario, redirigiendo a login...");
+            return window.location.href = 'login.html';
+        }
+        
+        console.log("Cargando UI para:", currentUser.name);
         updateUI(currentUser);
         
         if (currentPage) {
@@ -59,41 +64,59 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     const cachedProjects = JSON.parse(localCache);
                     window.currentLoadedProjects = cachedProjects;
+                    console.log("Caché cargada:", cachedProjects.length, "proyectos");
                     renderPageData(cachedProjects, currentPage);
                     if(currentPage === 'proyectos') initKanbanControls();
-                } catch (e) { console.error("Cache error", e); }
+                } catch (e) { console.error("Error leyendo caché:", e); }
             }
         }
     }
 
-    // --- 2. DESCARGA DINÁMICA DE SUPABASE (Segundo plano) ---
-    const { supabase } = await import('./supabase-config.js');
+    // --- 2. CARGA DE SUPABASE (SIN BLOQUEAR EL HILO PRINCIPAL) ---
+    let supabase;
+    try {
+        const module = await import('./supabase-config.js');
+        supabase = module.supabase;
+        console.log("Supabase cargado exitosamente.");
+    } catch (err) {
+        console.error("Error crítico cargando Supabase:", err);
+        showToast("Error de conexión con el servidor", "error");
+        return;
+    }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (session?.user) console.log("Auth:", session.user.email);
-    });
-
-    // --- AUTH PAGES ---
+    // --- AUTH LOGIC ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value.trim();
+            
             try {
+                showToast('Verificando credenciales...', 'info');
                 const { data: cred, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                localStorage.setItem('uts_user', JSON.stringify({id: cred.user.id, name: cred.user.user_metadata?.name || 'Estudiante', email: cred.user.email, career: 'Ingeniería de Sistemas'}));
-                showToast('Inicio exitoso', 'success');
+                
+                // Intentar recuperar el nombre real desde la tabla 'users'
+                let userName = cred.user.user_metadata?.name;
+                if (!userName) {
+                    const { data: profile } = await supabase.from('users').select('name, career').eq('id', cred.user.id).single();
+                    if (profile) userName = profile.name;
+                }
+
+                const userData = {
+                    id: cred.user.id, 
+                    name: userName || 'Estudiante UTS', 
+                    email: cred.user.email, 
+                    career: cred.user.user_metadata?.career || 'Ingeniería de Sistemas'
+                };
+
+                localStorage.setItem('uts_user', JSON.stringify(userData));
+                showToast('¡Bienvenido, ' + (userName || 'Estudiante') + '!', 'success');
                 setTimeout(() => window.location.href = 'dashboard.html', 1000);
             } catch (err) {
-                if (email === 'admin') {
-                    localStorage.setItem('uts_user', JSON.stringify({id: 'mock123', name: 'Admin Demo', career: 'Sistemas'}));
-                    showToast('Modo Demo', 'info');
-                    setTimeout(() => window.location.href = 'dashboard.html', 1000);
-                } else {
-                    showToast("Credenciales inválidas.", "error");
-                }
+                console.error("Login error:", err);
+                showToast("Correo o contraseña incorrectos", "error");
             }
         };
     }
