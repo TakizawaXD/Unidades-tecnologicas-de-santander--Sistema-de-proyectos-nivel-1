@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loginForm) {
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value.trim();
             try {
                 const { data: cred, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
@@ -102,13 +102,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (registerForm) {
         registerForm.onsubmit = async (e) => {
             e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const code = document.getElementById('reg-code').value;
-            const email = document.getElementById('reg-email').value;
+            const name = document.getElementById('reg-name').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
             const career = document.getElementById('reg-career').value;
             const semester = document.getElementById('reg-semester').value;
             const journey = document.getElementById('reg-journey').value;
-            const password = document.getElementById('reg-pass').value;
+            const password = document.getElementById('reg-pass').value.trim();
 
             try {
                 showToast('Creando cuenta...', 'info');
@@ -178,25 +178,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     function listenToProjects(userId, page) {
 
         const fetchAndRender = async () => {
-            const { data, error } = await supabase.from('projects').select('*').eq('userId', userId);
-            if (error) return console.error("Supabase Error:", error);
-            const projects = data || [];
-            projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            window.currentLoadedProjects = projects;
-            localStorage.setItem(`uts_projects_cache_${userId}`, JSON.stringify(projects));
-            
-            // Sincronizar con SQLite local solo si estamos en localhost
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                const uData = localStorage.getItem('uts_user');
-                const userObj = uData ? JSON.parse(uData) : null;
-                fetch('http://localhost:3000/api/sync', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user: userObj, projects: projects })
-                }).catch(e => console.warn("Backend local no disponible"));
-            }
+            try {
+                console.log("Iniciando fetch de proyectos para el usuario:", userId);
+                const { data, error } = await supabase.from('projects').select('*').eq('userId', userId);
+                
+                if (error) {
+                    console.error("Error de Supabase:", error);
+                    // Si hay error, intentamos al menos mostrar lo que hay en caché
+                    return;
+                }
 
-            renderPageData(projects, page);
+                const projects = data || [];
+                console.log("Proyectos recibidos de Supabase:", projects.length);
+                
+                projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                window.currentLoadedProjects = projects;
+                localStorage.setItem(`uts_projects_cache_${userId}`, JSON.stringify(projects));
+                
+                // Sincronizar con SQLite local solo si estamos en localhost
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log("Sincronizando con SQLite local...");
+                    const uData = localStorage.getItem('uts_user');
+                    const userObj = uData ? JSON.parse(uData) : null;
+                    fetch('http://localhost:3000/api/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user: userObj, projects: projects })
+                    }).catch(e => console.warn("Backend local no disponible"));
+                }
+
+                console.log("Dibujando datos en la interfaz...");
+                renderPageData(projects, page);
+
+            } catch (err) {
+                console.error("Fallo crítico en fetchAndRender:", err);
+            }
         };
         fetchAndRender();
         supabase.channel('projects_changes')
