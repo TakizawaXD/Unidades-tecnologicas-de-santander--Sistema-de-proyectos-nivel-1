@@ -127,7 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
             const code = document.getElementById('reg-code').value.trim();
-            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const email = document.getElementById('reg-email').value.replace(/\s/g, '').toLowerCase();
+            console.log("Intentando registro con email limpio:", email);
             const career = document.getElementById('reg-career').value;
             const semester = document.getElementById('reg-semester').value;
             const journey = document.getElementById('reg-journey').value;
