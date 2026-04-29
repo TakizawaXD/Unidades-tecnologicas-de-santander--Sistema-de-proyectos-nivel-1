@@ -1,9 +1,7 @@
 // UTS Platform - Firebase Integrated Logic with Advanced Enterprise Features
-import { db, auth } from './firebase-config.js';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { collection, addDoc, setDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where } from "firebase/firestore";
+// --- Imports Estáticos Removidos para permitir Zero-Latency ---
 
-const TOTAL_REQUIRED_PROJECTS = 52; 
+const TOTAL_REQUIRED_PROJECTS = 52;  
 
 // --- 1. UI UTILITIES & TOAST ---
 window.showToast = (message, type = 'success') => {
@@ -33,7 +31,7 @@ window.toggleDarkMode = (force) => {
     localStorage.setItem('uts_theme', isDark ? 'dark' : 'light');
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const savedTheme = localStorage.getItem('uts_theme');
     if (savedTheme === 'dark') toggleDarkMode(true);
     const themeToggle = document.getElementById('themeToggle');
@@ -44,8 +42,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentUser = JSON.parse(localStorage.getItem('uts_user'));
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) console.log("Auth:", user.email);
+    // --- 1. ZERO-LATENCY UI RENDER (Se ejecuta ANTES de descargar Firebase) ---
+    const isAppPage = ['dashboard.html', 'inicio.html', 'proyectos.html', 'cursos.html', 'reportes.html', 'configuracion.html'].some(p => window.location.pathname.includes(p));
+    let currentPage = null;
+    if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('inicio.html')) currentPage = 'dashboard';
+    if (window.location.pathname.includes('proyectos.html')) currentPage = 'proyectos';
+    if (window.location.pathname.includes('reportes.html')) currentPage = 'reportes';
+
+    if (isAppPage) {
+        if (!currentUser) return window.location.href = 'login.html';
+        updateUI(currentUser);
+        
+        if (currentPage) {
+            const localCache = localStorage.getItem(`uts_projects_cache_${currentUser.id}`);
+            if (localCache) {
+                try {
+                    const cachedProjects = JSON.parse(localCache);
+                    window.currentLoadedProjects = cachedProjects;
+                    renderPageData(cachedProjects, currentPage);
+                    if(currentPage === 'proyectos') initKanbanControls();
+                } catch (e) { console.error("Cache error", e); }
+            }
+        }
+    }
+
+    // --- 2. DESCARGA DINÁMICA DE SUPABASE (Segundo plano) ---
+    const { supabase } = await import('./supabase-config.js');
+
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user) console.log("Auth:", session.user.email);
     });
 
     // --- AUTH PAGES ---
@@ -56,8 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             try {
-                const cred = await signInWithEmailAndPassword(auth, email, password);
-                localStorage.setItem('uts_user', JSON.stringify({id: cred.user.uid, name: cred.user.displayName || 'Estudiante', email: cred.user.email, career: 'Ingeniería de Sistemas'}));
+                const { data: cred, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                localStorage.setItem('uts_user', JSON.stringify({id: cred.user.id, name: cred.user.user_metadata?.name || 'Estudiante', email: cred.user.email, career: 'Ingeniería de Sistemas'}));
                 showToast('Inicio exitoso', 'success');
                 setTimeout(() => window.location.href = 'dashboard.html', 1000);
             } catch (err) {
@@ -86,16 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 showToast('Creando cuenta...', 'info');
-                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                const { data: cred, error } = await supabase.auth.signUp({ email, password, options: { data: { name, code, career, semester, journey } } });
+                if (error) throw error;
                 
-                // Save user extra data to Firestore
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    name, code, email, career, semester, journey,
+                // Save user extra data to Supabase
+                await supabase.from('users').insert([{
+                    id: cred.user.id, name, code, email, career, semester, journey,
                     createdAt: new Date().toISOString()
-                });
+                }]);
 
                 localStorage.setItem('uts_user', JSON.stringify({
-                    id: cred.user.uid, 
+                    id: cred.user.id, 
                     name: name, 
                     email: email, 
                     career: career,
@@ -123,31 +150,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.onclick = async (e) => {
             e.preventDefault();
-            await signOut(auth);
+            await supabase.auth.signOut();
             localStorage.clear();
             window.location.href = 'login.html';
         };
     }
 
-    // --- GLOBAL APP LOGIC ---
-    const isAppPage = ['dashboard.html', 'inicio.html', 'proyectos.html', 'cursos.html', 'reportes.html', 'configuracion.html'].some(p => window.location.pathname.includes(p));
-    
-    if (isAppPage) {
-        if (!currentUser) return window.location.href = 'login.html';
-        updateUI(currentUser);
-
-
-        if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('inicio.html')) {
-            listenToProjects(currentUser.id, 'dashboard');
-        }
-        if (window.location.pathname.includes('proyectos.html')) {
+    // --- GLOBAL APP LOGIC (FireStore Listener) ---
+    if (isAppPage && currentUser) {
+        if (currentPage === 'dashboard') listenToProjects(currentUser.id, 'dashboard');
+        if (currentPage === 'proyectos') {
             initProjectCRUD();
             listenToProjects(currentUser.id, 'proyectos');
-            initKanbanControls(); // FEATURE: Kanban
+            initKanbanControls(); 
         }
-        if (window.location.pathname.includes('reportes.html')) {
-            listenToProjects(currentUser.id, 'reportes');
-        }
+        if (currentPage === 'reportes') listenToProjects(currentUser.id, 'reportes');
     }
 
     function updateUI(user) {
@@ -159,29 +176,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function listenToProjects(userId, page) {
-        // RENDERING INSTANTÁNEO: Cargar desde localStorage antes de consultar a Firebase
-        const localCache = localStorage.getItem(`uts_projects_cache_${userId}`);
-        if (localCache) {
-            try {
-                const cachedProjects = JSON.parse(localCache);
-                window.currentLoadedProjects = cachedProjects;
-                renderPageData(cachedProjects, page);
-            } catch (e) { console.error("Cache error", e); }
-        }
 
-        const q = query(collection(db, "projects"), where("userId", "==", userId));
-        onSnapshot(q, (snapshot) => {
-            const projects = [];
-            snapshot.forEach(doc => projects.push({ id: doc.id, ...doc.data() }));
+        const fetchAndRender = async () => {
+            const { data, error } = await supabase.from('projects').select('*').eq('userId', userId);
+            if (error) return console.error("Supabase Error:", error);
+            const projects = data || [];
             projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             window.currentLoadedProjects = projects;
-
-            // Guardar en caché ultra-rápida
             localStorage.setItem(`uts_projects_cache_${userId}`, JSON.stringify(projects));
+            
+            // Sincronizar con SQLite local solo si estamos en localhost
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                const uData = localStorage.getItem('uts_user');
+                const userObj = uData ? JSON.parse(uData) : null;
+                fetch('http://localhost:3000/api/sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: userObj, projects: projects })
+                }).catch(e => console.warn("Backend local no disponible"));
+            }
 
-            // Actualizar UI con datos reales
             renderPageData(projects, page);
-        }, err => console.error("Firestore Error:", err));
+        };
+        fetchAndRender();
+        supabase.channel('projects_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'projects', filter: `userId=eq.${userId}` }, fetchAndRender)
+            .subscribe();
     }
 
     function renderPageData(projects, page) {
@@ -255,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             const newStatus = evt.to.parentElement.getAttribute('data-status');
                             // Update Firestore silently
                             try {
-                                await updateDoc(doc(db, "projects", itemId), { status: newStatus });
+                                await supabase.from('projects').update({ status: newStatus }).eq('id', itemId);
                                 showToast('Estado actualizado', 'success');
                             } catch(e) {
                                 console.error(e);
@@ -488,8 +508,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 createdAt: new Date().toISOString()
             };
             try {
-                if (id) await updateDoc(doc(db, "projects", id), projectData);
-                else await addDoc(collection(db, "projects"), projectData);
+                if (id) await supabase.from('projects').update(projectData).eq('id', id);
+                else await supabase.from('projects').insert([projectData]);
                 modal.style.display = 'none';
                 showToast(id ? 'Actualizado' : 'Creado', 'success');
             } catch(e) { console.error(e); showToast('Error', 'error'); }
@@ -513,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.deleteProject = async (id) => {
         if(confirm("¿Eliminar proyecto?")) {
-            await deleteDoc(doc(db, "projects", id));
+            await supabase.from('projects').delete().eq('id', id);
             showToast('Eliminado', 'success');
         }
     };
