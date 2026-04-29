@@ -159,6 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function listenToProjects(userId, page) {
+        // RENDERING INSTANTÁNEO: Cargar desde localStorage antes de consultar a Firebase
+        const localCache = localStorage.getItem(`uts_projects_cache_${userId}`);
+        if (localCache) {
+            try {
+                const cachedProjects = JSON.parse(localCache);
+                window.currentLoadedProjects = cachedProjects;
+                renderPageData(cachedProjects, page);
+            } catch (e) { console.error("Cache error", e); }
+        }
+
         const q = query(collection(db, "projects"), where("userId", "==", userId));
         onSnapshot(q, (snapshot) => {
             const projects = [];
@@ -166,17 +176,25 @@ document.addEventListener('DOMContentLoaded', () => {
             projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             window.currentLoadedProjects = projects;
 
-            if (page === 'dashboard') {
-                updateStatsFromProjects(projects);
-                renderChart(projects); // FEATURE: ChartJS
-                checkBadges(projects); // FEATURE: Gamification
-            } else if (page === 'proyectos') {
-                renderProjectsTable(projects);
-                renderKanbanBoard(projects);
-            } else if (page === 'reportes') {
-                initPDFGenerator(projects); // FEATURE: PDF
-            }
-        }, err => console.error(err));
+            // Guardar en caché ultra-rápida
+            localStorage.setItem(`uts_projects_cache_${userId}`, JSON.stringify(projects));
+
+            // Actualizar UI con datos reales
+            renderPageData(projects, page);
+        }, err => console.error("Firestore Error:", err));
+    }
+
+    function renderPageData(projects, page) {
+        if (page === 'dashboard') {
+            updateStatsFromProjects(projects);
+            renderChart(projects); // FEATURE: ChartJS
+            checkBadges(projects); // FEATURE: Gamification
+        } else if (page === 'proyectos') {
+            renderProjectsTable(projects);
+            renderKanbanBoard(projects);
+        } else if (page === 'reportes') {
+            initPDFGenerator(projects); // FEATURE: PDF
+        }
     }
 
     // --- 2. KANBAN BOARD (Proyectos) ---
