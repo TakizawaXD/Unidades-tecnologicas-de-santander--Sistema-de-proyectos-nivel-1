@@ -1,6 +1,6 @@
 // Firebase Configuration for UTS Platform
 import { initializeApp } from "firebase/app";
-import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -15,15 +15,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
-// Habilitar persistencia offline para que los datos carguen instantáneamente desde la caché local
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code == 'failed-precondition') {
-    console.warn("Múltiples pestañas abiertas, la persistencia offline solo funciona en una a la vez.");
-  } else if (err.code == 'unimplemented') {
-    console.warn("El navegador no soporta persistencia offline.");
-  }
+// Habilitar persistencia offline utilizando la API moderna sin warnings
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
 
 const auth = getAuth(app);

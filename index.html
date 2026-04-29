@@ -534,12 +534,38 @@
             font-size: 14px;
         }
 
+        .mobile-menu-btn {
+            display: none;
+            font-size: 24px;
+            color: var(--uts-blue);
+            cursor: pointer;
+        }
+
         @media (max-width: 992px) {
             .hero-title { font-size: 48px; }
             .step-row, .step-row:nth-child(even) { flex-direction: column; gap: 30px; text-align: center; }
             .footer-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
             .footer-brand p { margin: 0 auto; }
-            .landing-nav { display: none; }
+            
+            .mobile-menu-btn { display: block; }
+            
+            .landing-nav { 
+                display: flex; 
+                flex-direction: column; 
+                position: absolute; 
+                top: 76px; 
+                left: 0; 
+                width: 100%; 
+                background: white; 
+                padding: 20px; 
+                gap: 20px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+                transition: clip-path 0.4s ease-in-out;
+            }
+            .landing-nav.active {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+            }
         }
         @media (max-width: 576px) {
             .hero-title { font-size: 38px; }
@@ -558,11 +584,13 @@
 
     <!-- HEADER -->
     <header class="landing-header">
-        <!-- Se eliminó filter: invert(1) para mantener los colores originales -->
         <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="landing-logo"> 
+        <div class="mobile-menu-btn" onclick="document.querySelector('.landing-nav').classList.toggle('active')">
+            <i class="fas fa-bars"></i>
+        </div>
         <nav class="landing-nav">
-            <a href="#caracteristicas">Características</a>
-            <a href="#como-funciona">Cómo Funciona</a>
+            <a href="#caracteristicas" onclick="document.querySelector('.landing-nav').classList.remove('active')">Características</a>
+            <a href="#como-funciona" onclick="document.querySelector('.landing-nav').classList.remove('active')">Cómo Funciona</a>
             <a href="pages/login.html" class="nav-btn">Iniciar Sesión</a>
         </nav>
     </header>
