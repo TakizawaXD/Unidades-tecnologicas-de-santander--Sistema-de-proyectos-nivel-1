@@ -3,109 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursos - UTS Enterprise</title>
+    <title>Catálogo Académico - UTS Enterprise</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png">
-
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#004A87">
+    <style>
+    /* ── STATS BAR ── */
+    .courses-stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .cstat{background:var(--uts-white);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
+    .cstat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .cstat-info span:first-child{display:block;font-size:22px;font-weight:800;color:var(--uts-text-main)}
+    .cstat-info span:last-child{font-size:12px;color:var(--uts-text-muted);font-weight:500}
+    /* ── TABS ── */
+    .courses-tabs{display:flex;gap:8px;margin-bottom:24px;background:var(--uts-gray-light);border-radius:14px;padding:5px}
+    .tab-btn{flex:1;padding:10px 20px;border:none;background:transparent;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;color:var(--uts-text-muted);transition:all .2s}
+    .tab-btn.active{background:var(--uts-white);color:var(--uts-blue);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    /* ── TOOLBAR ── */
+    .courses-toolbar{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center}
+    .course-search-wrap{position:relative;flex:1;min-width:220px}
+    .course-search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--uts-text-muted)}
+    #courseSearch{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--uts-gray-medium);border-radius:12px;background:var(--uts-white);font-size:14px;color:var(--uts-text-main);font-family:inherit}
+    #levelFilter{padding:11px 16px;border:1px solid var(--uts-gray-medium);border-radius:12px;background:var(--uts-white);font-size:14px;color:var(--uts-text-main);font-family:inherit;cursor:pointer}
+    .filter-chips{display:flex;gap:8px;flex-wrap:wrap}
+    .filter-chip{padding:7px 16px;border:1px solid var(--uts-gray-medium);border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;background:var(--uts-white);color:var(--uts-text-muted);transition:all .2s}
+    .filter-chip.active{background:var(--uts-blue);color:white;border-color:var(--uts-blue)}
+    /* ── COURSE CARDS ── */
+    .courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin-bottom:30px}
+    .course-card-v2{background:var(--uts-white);border-radius:20px;padding:24px;border:1px solid var(--uts-gray-medium);cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+    .course-card-v2::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-color,#004A87)}
+    .course-card-v2:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.1);border-color:var(--card-color)}
+    .course-badge-v2{position:absolute;top:16px;right:16px;background:#ef4444;color:white;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+    .course-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+    .course-icon-wrap{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px}
+    .course-card-meta-top{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .level-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+    .level-principiante{background:#d1fae5;color:#065f46}
+    .level-intermedio{background:#dbeafe;color:#1e40af}
+    .level-avanzado{background:#fce7f3;color:#9d174d}
+    .hours-tag{font-size:12px;color:var(--uts-text-muted);font-weight:600}
+    .course-card-title{font-size:16px;font-weight:800;margin-bottom:8px;line-height:1.3}
+    .course-card-desc{font-size:13px;color:var(--uts-text-muted);line-height:1.6;margin-bottom:14px}
+    .tech-stack{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+    .tech-chip{font-size:11px;background:var(--uts-gray-light);color:var(--uts-text-muted);padding:3px 10px;border-radius:20px;font-weight:600}
+    .course-card-footer{display:flex;justify-content:space-between;align-items:center}
+    .instructor-tag{font-size:12px;color:var(--uts-text-muted)}
+    .btn-enroll{background:var(--card-color,#004A87);color:white;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+    .btn-enroll:hover{opacity:.85;transform:translateY(-1px)}
+    .enrolled-badge{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--uts-green)}
+    .mini-progress-bar{height:3px;background:var(--uts-gray-light);border-radius:2px;margin-top:14px;overflow:hidden}
+    .mini-progress-fill{height:100%;border-radius:2px;transition:width .5s}
+    .empty-courses{text-align:center;padding:60px 20px;color:var(--uts-text-muted)}
+    .empty-courses i{font-size:48px;margin-bottom:16px;display:block;opacity:.3}
+    /* ── MY COURSES ── */
+    .my-courses-list{display:flex;flex-direction:column;gap:16px}
+    .my-course-row{background:var(--uts-white);border-radius:18px;padding:20px 24px;display:flex;gap:18px;align-items:flex-start;border:1px solid var(--uts-gray-medium);cursor:pointer;transition:all .2s}
+    .my-course-row:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateX(4px)}
+    .my-course-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+    .my-course-info{flex:1;min-width:0}
+    .my-course-info h4{font-size:16px;font-weight:800;margin-bottom:4px}
+    .my-course-info>span{font-size:12px;color:var(--uts-text-muted);display:block;margin-bottom:10px}
+    .progress-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .progress-bar-track{flex:1;height:6px;background:var(--uts-gray-light);border-radius:3px;overflow:hidden}
+    .progress-bar-fill-v2{height:100%;border-radius:3px;transition:width .5s}
+    .progress-pct{font-size:12px;font-weight:700;color:var(--uts-text-muted);width:34px;text-align:right}
+    .units-mini{display:flex;gap:5px;flex-wrap:wrap}
+    .unit-dot{width:10px;height:10px;border-radius:50%;background:var(--uts-gray-medium);transition:background .3s}
+    .unit-dot.done{background:var(--uts-green)}
+    .my-course-status{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+    .status-pill{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap}
+    .status-completed{background:#d1fae5;color:#065f46}
+    .status-in-progress{background:#dbeafe;color:#1e40af}
+    .btn-unenroll{border:1px solid var(--uts-gray-medium);background:transparent;width:30px;height:30px;border-radius:8px;cursor:pointer;color:var(--uts-text-muted);transition:all .2s;display:flex;align-items:center;justify-content:center}
+    .btn-unenroll:hover{background:#fee2e2;color:#ef4444;border-color:#ef4444}
+    /* ── MODAL ── */
+    #courseModalOverlay{position:fixed;inset:0;background:rgba(0,20,40,.65);backdrop-filter:blur(6px);display:none;justify-content:center;align-items:center;z-index:5000;padding:20px}
+    .course-modal-card{background:var(--uts-white);border-radius:24px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 30px 60px rgba(0,0,0,.3);animation:modalUp .35s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes modalUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+    .modal-top-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 28px 0}
+    #modalTitle{font-size:20px;font-weight:800;color:var(--uts-blue)}
+    #closeModalBtn{width:36px;height:36px;border-radius:50%;border:none;background:var(--uts-gray-light);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--uts-text-muted);transition:all .2s}
+    #closeModalBtn:hover{background:var(--uts-gray-medium);color:#ef4444}
+    #modalBody{padding:0 28px 28px}
+    .modal-course-hero{border-radius:16px;padding:24px;margin:16px 0 20px;color:white;display:flex;gap:20px;align-items:center}
+    .modal-hero-icon{font-size:48px;opacity:.9}
+    .modal-hero-info{flex:1}
+    .modal-meta-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .mchip{background:rgba(255,255,255,.2);backdrop-filter:blur(4px);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+    .modal-progress-track{height:6px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden;margin-top:6px}
+    .modal-tabs{display:flex;gap:6px;margin-bottom:20px;border-bottom:2px solid var(--uts-gray-light);padding-bottom:0}
+    .modal-tab{padding:10px 18px;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:var(--uts-text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+    .modal-tab.active{color:var(--uts-blue);border-bottom-color:var(--uts-blue)}
+    .objectives-list{list-style:none;display:grid;gap:8px;margin-bottom:20px}
+    .objectives-list li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.6}
+    .prereq-box{background:var(--uts-gray-light);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--uts-text-muted);margin-top:16px}
+    .syllabus-list{display:flex;flex-direction:column;gap:10px}
+    .syllabus-unit{border:1px solid var(--uts-gray-medium);border-radius:14px;overflow:hidden;transition:all .2s}
+    .syllabus-unit.done{border-color:#10b981;background:#f0fdf4}
+    .unit-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;transition:background .2s}
+    .unit-header:hover{background:var(--uts-gray-light)}
+    .unit-num-wrap{display:flex;align-items:center;gap:12px}
+    .unit-num{width:28px;height:28px;border-radius:8px;color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .unit-chevron{transition:transform .25s;color:var(--uts-text-muted)}
+    .unit-check-btn{font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;border:1px solid var(--uts-gray-medium);background:var(--uts-white);cursor:pointer;transition:all .2s}
+    .unit-check-btn.checked{background:#d1fae5;color:#065f46;border-color:#10b981}
+    .unit-topics{padding:0 18px 14px 58px;display:flex;flex-direction:column;gap:8px}
+    .topic-item{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--uts-text-muted)}
+    .tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+    .tech-card{background:var(--uts-gray-light);border-radius:12px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;font-weight:600;text-align:center;transition:all .2s}
+    .tech-card:hover{background:var(--uts-gray-medium);transform:translateY(-2px)}
+    .tech-card i{font-size:20px;color:var(--uts-blue);opacity:.7}
+    .progress-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+    .prog-stat{background:var(--uts-gray-light);border-radius:14px;padding:16px;text-align:center}
+    .prog-num{display:block;font-size:28px;font-weight:800;color:var(--uts-blue);margin-bottom:4px}
+    .prog-stat span:last-child{font-size:12px;color:var(--uts-text-muted)}
+    .big-progress-track{height:12px;background:var(--uts-gray-light);border-radius:6px;overflow:hidden}
+    .big-progress-fill{height:100%;border-radius:6px;transition:width .6s}
+    .modal-action-footer{margin-top:24px;padding-top:20px;border-top:1px solid var(--uts-gray-light);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .btn-enroll-modal{background:var(--uts-green);color:white;border:none;padding:13px 28px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;box-shadow:0 4px 15px rgba(0,141,62,.3)}
+    .btn-enroll-modal:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,141,62,.4)}
+    .btn-unenroll-modal{background:transparent;color:#ef4444;border:1px solid #ef4444;padding:10px 20px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+    .btn-unenroll-modal:hover{background:#fee2e2}
+    .enrolled-status-modal{font-size:14px;font-weight:700;color:var(--uts-green);display:flex;align-items:center;gap:6px}
+    @media(max-width:768px){
+        .courses-stats-bar{grid-template-columns:repeat(2,1fr)}
+        .courses-toolbar{flex-direction:column}
+        .progress-dashboard{grid-template-columns:repeat(3,1fr)}
+        .my-course-row{flex-wrap:wrap}
+    }
+    @media(max-width:480px){
+        .courses-stats-bar{grid-template-columns:1fr 1fr}
+        .modal-meta-chips{display:none}
+    }
+    </style>
 </head>
 <body class="dashboard-body">
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="mainSidebar">
-            <div class="sidebar-header">
-                <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="mainSidebar">
+        <div class="sidebar-header" style="text-align:center">
+            <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
+        </div>
+        <ul class="nav-menu">
+            <div class="nav-group-label">MENÚ PRINCIPAL</div>
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
+            <li class="nav-item"><a href="proyectos.html" class="nav-link"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
+            <li class="nav-item"><a href="cursos.html" class="nav-link active"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
+            <div class="nav-group-label" style="margin-top:30px">AUDITORÍA</div>
+            <li class="nav-item"><a href="reportes.html" class="nav-link"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
+            <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
+            <li class="nav-item" style="margin-top:30px"><a href="login.html" class="nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-nav">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="courseSearch" placeholder="Buscar cursos, tecnologías...">
             </div>
-            <ul class="nav-menu">
-                <div class="nav-group-label">MENÚ PRINCIPAL</div>
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
-                <li class="nav-item"><a href="proyectos.html" class="nav-link"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
-                <li class="nav-item"><a href="cursos.html" class="nav-link active"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
-                <div class="nav-group-label" style="margin-top: 30px;">AUDITORÍA</div>
-                <li class="nav-item"><a href="reportes.html" class="nav-link"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
-                <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
-            </ul>
-        </aside>
-
-        <main class="main-content">
-            <header class="top-nav">
-                <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Buscar cursos..."></div>
-                <div class="top-nav-actions"><div class="user-profile-header"><div class="user-meta"><span id="userName" class="user-full-name">Estudiante UTS</span><span id="userCareer" class="user-role">Ingeniería de Sistemas</span></div><div class="avatar-circle" id="userInitial" role="img" aria-label="Avatar del usuario">U</div></div></div>
-            </header>
-
-            <div class="dashboard-section reveal-animation">
-                <div class="page-title-area" style="margin-bottom: 40px;">
-                    <h1 class="premium-title">Catálogo de Vanguardia</h1>
-                    <p class="premium-subtitle">Potencia tu perfil con los cursos oficiales de las Unidades Tecnológicas de Santander.</p>
-                </div>
-
-                <div class="kpi-grid">
-                    <div class="premium-course-card">
-                        <div class="course-badge">NUEVO</div>
-                        <div class="course-icon"><i class="fas fa-code"></i></div>
-                        <h3>Desarrollo Web Full Stack</h3>
-                        <p>Domina React, Node.js y despliegue en la nube.</p>
-                        <div class="course-meta"><span><i class="fas fa-clock"></i> 60 Horas</span><span><i class="fas fa-user-tie"></i> Certificado</span></div>
-                        <button class="btn-primary-glow" style="width: 100%;" onclick="window.showToast('Inscrito en el curso exitosamente', 'success')">Inscribirme Gratis</button>
+            <div class="top-nav-actions">
+                <div class="user-profile-header">
+                    <div class="user-meta">
+                        <span id="userName" class="user-full-name">Estudiante UTS</span>
+                        <span id="userCareer" class="user-role">Ingeniería</span>
                     </div>
-                    <div class="premium-course-card">
-                        <div class="course-icon" style="color: #10b981;"><i class="fas fa-shield-alt"></i></div>
-                        <h3>Ciberseguridad Ofensiva</h3>
-                        <p>Análisis de vulnerabilidades y defensa de redes.</p>
-                        <div class="course-meta"><span><i class="fas fa-clock"></i> 45 Horas</span><span><i class="fas fa-lock"></i> Nivel Avanzado</span></div>
-                        <button class="btn-primary-glow" style="width: 100%;" onclick="window.showToast('Inscrito en el curso exitosamente', 'success')">Inscribirme Gratis</button>
-                    </div>
-                    </div>
-                    <div class="premium-course-card">
-                        <div class="course-badge" style="background: #8b5cf6;">HOT</div>
-                        <div class="course-icon" style="color: #8b5cf6;"><i class="fas fa-brain"></i></div>
-                        <h3>Inteligencia Artificial Aplicada</h3>
-                        <p>Machine Learning, Deep Learning y automatización con Python.</p>
-                        <div class="course-meta"><span><i class="fas fa-clock"></i> 80 Horas</span><span><i class="fas fa-microchip"></i> Nivel Avanzado</span></div>
-                        <button class="btn-primary-glow" style="width: 100%;" onclick="window.showToast('Inscrito en el curso exitosamente', 'success')">Inscribirme Gratis</button>
-                    </div>
-                    <div class="premium-course-card">
-                        <div class="course-icon" style="color: #f59e0b;"><i class="fas fa-tasks"></i></div>
-                        <h3>Gestión Ágil de Proyectos</h3>
-                        <p>Metodologías Scrum, Kanban y liderazgo de equipos de desarrollo.</p>
-                        <div class="course-meta"><span><i class="fas fa-clock"></i> 40 Horas</span><span><i class="fas fa-certificate"></i> Certificado UTS</span></div>
-                        <button class="btn-primary-glow" style="width: 100%;" onclick="window.showToast('Inscrito en el curso exitosamente', 'success')">Inscribirme Gratis</button>
-                    </div>
-                    <div class="premium-course-card">
-                        <div class="course-badge" style="background: var(--uts-blue);">PRO</div>
-                        <div class="course-icon" style="color: var(--uts-blue);"><i class="fas fa-cloud"></i></div>
-                        <h3>Arquitectura Cloud AWS</h3>
-                        <p>Despliegue, contenedores y microservicios escalables en la nube.</p>
-                        <div class="course-meta"><span><i class="fas fa-clock"></i> 65 Horas</span><span><i class="fas fa-server"></i> Nivel Avanzado</span></div>
-                        <button class="btn-primary-glow" style="width: 100%;" onclick="window.showToast('Inscrito en el curso exitosamente', 'success')">Inscribirme Gratis</button>
-                    </div>
-                    <div class="premium-course-card">
-                        <div class="course-icon" style="color: #ec4899;"><i class="fas fa-pen-nib"></i></div>
-                        <h3>Diseño de Interfaces UI/UX</h3>
-                        <p>Figma, prototipado interactivo y principios de diseño centrado en el usuario.</p>
-                        <div class="course-meta"><span><i class="fas fa-clock"></i> 50 Horas</span><span><i class="fas fa-palette"></i> Principiante</span></div>
-                        <button class="btn-primary-glow" style="width: 100%;" onclick="window.showToast('Inscrito en el curso exitosamente', 'success')">Inscribirme Gratis</button>
-                    </div>
+                    <div class="avatar-circle" id="userInitial">U</div>
                 </div>
             </div>
-        </main>
+        </header>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="mobile-bottom-nav">
-            <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
-            <a href="proyectos.html" class="mobile-nav-item"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
-            <a href="cursos.html" class="mobile-nav-item active"><i class="fas fa-book-open"></i><span>Cursos</span></a>
-            <a href="reportes.html" class="mobile-nav-item"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
-            <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
-        </nav>
+        <div class="dashboard-section reveal-animation">
+            <div class="page-title-area" style="margin-bottom:24px">
+                <h1 class="premium-title">Catálogo Académico</h1>
+                <p class="premium-subtitle">Potencia tu perfil técnico con cursos oficiales UTS. Progresa unidad a unidad y obtén tu certificado.</p>
+            </div>
+
+            <!-- Stats bar -->
+            <div class="courses-stats-bar">
+                <div class="cstat">
+                    <div class="cstat-icon" style="background:#dbeafe;color:#1d4ed8"><i class="fas fa-book-open"></i></div>
+                    <div class="cstat-info"><span id="statEnrolled">0</span><span>Inscritos</span></div>
+                </div>
+                <div class="cstat">
+                    <div class="cstat-icon" style="background:#d1fae5;color:#065f46"><i class="fas fa-check-circle"></i></div>
+                    <div class="cstat-info"><span id="statCompleted2">0</span><span>Completados</span></div>
+                </div>
+                <div class="cstat">
+                    <div class="cstat-icon" style="background:#fef3c7;color:#92400e"><i class="fas fa-spinner"></i></div>
+                    <div class="cstat-info"><span id="statInProgress">0</span><span>En progreso</span></div>
+                </div>
+                <div class="cstat">
+                    <div class="cstat-icon" style="background:#fce7f3;color:#9d174d"><i class="fas fa-clock"></i></div>
+                    <div class="cstat-info"><span id="statHours">0h</span><span>Horas cursadas</span></div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="courses-tabs">
+                <button class="tab-btn active" data-tab="catalog"><i class="fas fa-th-large"></i> Catálogo Completo</button>
+                <button class="tab-btn" data-tab="my"><i class="fas fa-user-graduate"></i> Mis Cursos</button>
+            </div>
+
+            <!-- CATALOG VIEW -->
+            <div id="catalogView">
+                <div class="courses-toolbar">
+                    <div class="course-search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="courseSearch" placeholder="Buscar por nombre, tecnología...">
+                    </div>
+                    <select id="levelFilter">
+                        <option value="">Todos los niveles</option>
+                        <option value="Principiante">Principiante</option>
+                        <option value="Intermedio">Intermedio</option>
+                        <option value="Avanzado">Avanzado</option>
+                    </select>
+                </div>
+                <div class="filter-chips" style="margin-bottom:20px">
+                    <button class="filter-chip active" data-filter="all">Todos</button>
+                    <button class="filter-chip" data-filter="Programación">Programación</button>
+                    <button class="filter-chip" data-filter="Seguridad">Seguridad</button>
+                    <button class="filter-chip" data-filter="IA / ML">IA / ML</button>
+                    <button class="filter-chip" data-filter="Cloud">Cloud</button>
+                    <button class="filter-chip" data-filter="Management">Management</button>
+                    <button class="filter-chip" data-filter="Diseño">Diseño</button>
+                </div>
+                <div id="coursesGrid" class="courses-grid">
+                    <!-- Skeletons -->
+                    ${Array(6).fill('<div class="course-card-v2"><div class="skeleton" style="height:50px;width:50px;border-radius:14px;margin-bottom:16px"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div>').join('')}
+                </div>
+            </div>
+
+            <!-- MY COURSES VIEW -->
+            <div id="myCoursesView" style="display:none">
+                <div id="myCoursesList" class="my-courses-list">
+                    <div class="empty-courses"><i class="fas fa-spinner fa-spin"></i><p>Cargando tus cursos...</p></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
+        <a href="proyectos.html" class="mobile-nav-item"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
+        <a href="cursos.html" class="mobile-nav-item active"><i class="fas fa-book-open"></i><span>Cursos</span></a>
+        <a href="reportes.html" class="mobile-nav-item"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
+        <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
+    </nav>
+</div>
+
+<!-- Course Detail Modal -->
+<div id="courseModalOverlay">
+    <div class="course-modal-card">
+        <div class="modal-top-bar">
+            <h2 id="modalTitle">Curso</h2>
+            <button id="closeModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="modalBody"></div>
     </div>
+</div>
 
-    <script type="importmap">{"imports": {"firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js","firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"}}</script>
-    <script type="module" src="../js/app.js"></script>
+<script src="../js/cursos.js"></script>
 </body>
 </html>

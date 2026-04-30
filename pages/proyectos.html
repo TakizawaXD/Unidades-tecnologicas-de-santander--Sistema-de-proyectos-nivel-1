@@ -3,198 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Proyectos - UTS Enterprise</title>
+    <title>Mis Proyectos — UTS Enterprise</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png">
-    
-    <!-- SortableJS for Kanban Board -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
     <style>
-        .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; min-height: 500px; display: none; }
-        .kanban-column { flex: 1; min-width: 280px; background: var(--uts-gray-light); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; }
-        .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: 700; font-size: 14px; padding: 0 5px; }
-        .kanban-column[data-status="pending"] .kanban-header { color: #f59e0b; }
-        .kanban-column[data-status="in-progress"] .kanban-header { color: #3b82f6; }
-        .kanban-column[data-status="review"] .kanban-header { color: #8b5cf6; }
-        .kanban-column[data-status="done"] .kanban-header { color: #10b981; }
-        .kanban-cards { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 100px; }
-        .kanban-card { background: var(--uts-white); padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: grab; transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.02); }
-        .kanban-card:active { cursor: grabbing; transform: scale(0.98); }
-        .kanban-card h4 { font-size: 14px; margin-bottom: 5px; color: var(--uts-text-main); }
-        .kanban-card p { font-size: 12px; color: var(--uts-text-muted); margin-bottom: 10px; }
-        .kanban-card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
-        .kanban-card .priority { padding: 3px 8px; border-radius: 6px; background: var(--uts-gray-light); color: var(--uts-text-muted); }
-        
-        .view-controls { display: flex; background: var(--uts-gray-light); padding: 5px; border-radius: 12px; margin-bottom: 20px; width: fit-content; }
-        .view-btn { padding: 8px 16px; border: none; background: transparent; color: var(--uts-text-muted); font-weight: 600; font-size: 14px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-        .view-btn.active { background: var(--uts-white); color: var(--uts-blue); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .p-kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+    .p-kpi{background:var(--uts-white);border-radius:14px;padding:14px 16px;text-align:center;border:1px solid rgba(0,0,0,.04);box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .2s}
+    .p-kpi:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+    .p-kpi-num{font-size:24px;font-weight:800;display:block}
+    .p-kpi-lbl{font-size:10px;color:var(--uts-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .grad-mini{background:linear-gradient(135deg,#001e36,var(--uts-blue));border-radius:16px;padding:16px 20px;margin-bottom:20px;color:white;display:flex;align-items:center;gap:16px}
+    .grad-mini-track{flex:1;height:8px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden}
+    .grad-mini-fill{height:100%;background:linear-gradient(90deg,#10b981,#06d6a0);border-radius:4px;transition:width 1s cubic-bezier(.22,1,.36,1)}
+    .grad-mini-pct{font-size:18px;font-weight:800;width:46px;text-align:right}
+    .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+    .search-proj-wrap{position:relative;flex:1;min-width:200px}
+    .search-proj-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--uts-text-muted)}
+    #projSearch{width:100%;padding:10px 13px 10px 38px;border:1px solid var(--uts-gray-medium);border-radius:12px;background:var(--uts-white);font-size:14px;color:var(--uts-text-main);font-family:inherit}
+    .p-filter-chips{display:flex;gap:7px;flex-wrap:wrap}
+    .p-filter-chip{padding:7px 14px;border:1px solid var(--uts-gray-medium);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--uts-white);color:var(--uts-text-muted);transition:all .2s}
+    .p-filter-chip.active{background:var(--uts-blue);color:white;border-color:var(--uts-blue)}
+    .view-controls{display:flex;background:var(--uts-gray-light);padding:4px;border-radius:12px;width:fit-content}
+    .view-btn{padding:8px 16px;border:none;background:transparent;color:var(--uts-text-muted);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;transition:all .2s}
+    .view-btn.active{background:var(--uts-white);color:var(--uts-blue);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .kanban-board{display:flex;gap:16px;overflow-x:auto;padding-bottom:20px;min-height:400px}
+    .kanban-column{flex:1;min-width:260px;background:var(--uts-gray-light);border-radius:16px;padding:14px;display:flex;flex-direction:column}
+    .kanban-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-weight:700;font-size:13px;padding:0 4px}
+    .kanban-column[data-status=pending] .kanban-header{color:#f59e0b}
+    .kanban-column[data-status=in-progress] .kanban-header{color:#3b82f6}
+    .kanban-column[data-status=review] .kanban-header{color:#8b5cf6}
+    .kanban-column[data-status=done] .kanban-header{color:#10b981}
+    .kanban-cards{flex:1;display:flex;flex-direction:column;gap:9px;min-height:80px}
+    .kanban-card{background:var(--uts-white);padding:14px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer;transition:all .2s;border:1px solid rgba(0,0,0,.03)}
+    .kanban-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1)}
+    .kanban-card h4{font-size:13px;font-weight:700;margin-bottom:4px}
+    .kanban-card p{font-size:11px;color:var(--uts-text-muted);margin-bottom:10px}
+    .kanban-card-meta{display:flex;justify-content:space-between;font-size:11px;font-weight:600}
+    .kanban-card .priority{padding:3px 8px;border-radius:6px;font-size:10px}
+    @media(max-width:768px){.p-kpi-bar{grid-template-columns:repeat(3,1fr)}.toolbar{flex-direction:column}.p-filter-chips{order:3}}
     </style>
-
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body class="dashboard-body">
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="mainSidebar">
-            <div class="sidebar-header" style="text-align: center;">
-                <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-header" style="text-align:center"><img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img"></div>
+        <ul class="nav-menu">
+            <div class="nav-group-label">MENÚ PRINCIPAL</div>
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
+            <li class="nav-item"><a href="proyectos.html" class="nav-link active"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
+            <li class="nav-item"><a href="cursos.html" class="nav-link"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
+            <div class="nav-group-label" style="margin-top:30px">AUDITORÍA</div>
+            <li class="nav-item"><a href="reportes.html" class="nav-link"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
+            <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
+            <li class="nav-item" style="margin-top:30px"><a href="login.html" class="nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a></li>
+        </ul>
+    </aside>
+    <main class="main-content">
+        <header class="top-nav">
+            <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Buscar proyectos..."></div>
+            <div class="top-nav-actions">
+                <div class="user-profile-header">
+                    <div class="user-meta"><span id="userName" class="user-full-name">Estudiante UTS</span><span id="userCareer" class="user-role">Ingeniería</span></div>
+                    <div class="avatar-circle" id="userInitial">U</div>
+                </div>
             </div>
-            <ul class="nav-menu">
-                <div class="nav-group-label">MENÚ PRINCIPAL</div>
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
-                <li class="nav-item"><a href="proyectos.html" class="nav-link active"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
-                <li class="nav-item"><a href="cursos.html" class="nav-link"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
-                <div class="nav-group-label" style="margin-top: 30px;">AUDITORÍA</div>
-                <li class="nav-item"><a href="reportes.html" class="nav-link"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
-                <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
-            </ul>
-        </aside>
-
-        <main class="main-content">
-            <header class="top-nav">
-                <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Buscar en mis proyectos..."></div>
-                <div class="top-nav-actions">
-                    <div class="user-profile-header">
-                        <div class="user-meta"><span id="userName" class="user-full-name">Estudiante UTS</span><span id="userCareer" class="user-role">Ingeniería de Sistemas</span></div>
-                        <div class="avatar-circle" id="userInitial">U</div>
-                    </div>
+        </header>
+        <div class="dashboard-section reveal-animation">
+            <div class="page-header-flex">
+                <div class="page-title-area">
+                    <h1 class="premium-title">Mis Proyectos</h1>
+                    <p class="premium-subtitle">Gestiona tus proyectos académicos con vista de lista y tablero Kanban.</p>
                 </div>
-            </header>
+                <button class="btn-primary-glow" id="openModalBtn"><i class="fas fa-plus" style="margin-right:8px"></i>Nuevo Proyecto</button>
+            </div>
 
-            <div class="dashboard-section reveal-animation">
-                <div class="page-header-flex">
-                    <div class="page-title-area">
-                        <h1 class="premium-title">Mis Proyectos</h1>
-                        <p class="premium-subtitle">Gestiona tus proyectos con el nuevo Tablero Kanban interactivo.</p>
-                    </div>
-                    <button class="btn-primary-glow" id="openModalBtn">
-                        <i class="fas fa-plus" style="margin-right: 8px;"></i> Nuevo Proyecto
-                    </button>
+            <!-- KPIs -->
+            <div class="p-kpi-bar">
+                <div class="p-kpi"><span class="p-kpi-num" id="pKpiTotal" style="color:var(--uts-blue)">—</span><span class="p-kpi-lbl">Total</span></div>
+                <div class="p-kpi"><span class="p-kpi-num" id="pKpiDone" style="color:#10b981">—</span><span class="p-kpi-lbl">Completados</span></div>
+                <div class="p-kpi"><span class="p-kpi-num" id="pKpiInProg" style="color:#3b82f6">—</span><span class="p-kpi-lbl">En Progreso</span></div>
+                <div class="p-kpi"><span class="p-kpi-num" id="pKpiReview" style="color:#8b5cf6">—</span><span class="p-kpi-lbl">Revisión</span></div>
+                <div class="p-kpi"><span class="p-kpi-num" id="pKpiPending" style="color:#94a3b8">—</span><span class="p-kpi-lbl">Pendientes</span></div>
+            </div>
+
+            <!-- Grad mini bar -->
+            <div class="grad-mini">
+                <i class="fas fa-graduation-cap" style="font-size:24px;opacity:.9"></i>
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:700;margin-bottom:6px">Avance hacia Graduación</div>
+                    <div class="grad-mini-track"><div id="pGradFill" class="grad-mini-fill" style="width:0%"></div></div>
+                    <div style="font-size:11px;opacity:.7;margin-top:5px" id="pGradSub">Cargando...</div>
                 </div>
+                <div class="grad-mini-pct" id="pGradPct">0%</div>
+                <a href="reportes.html" style="color:rgba(255,255,255,.7);font-size:12px;font-weight:600;text-decoration:none">Reporte →</a>
+            </div>
 
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-proj-wrap"><i class="fas fa-search"></i><input type="text" id="projSearch" placeholder="Buscar por nombre, categoría, tutor..."></div>
+                <div class="p-filter-chips">
+                    <button class="p-filter-chip active" data-status="all">Todos</button>
+                    <button class="p-filter-chip" data-status="pending">Pendiente</button>
+                    <button class="p-filter-chip" data-status="in-progress">En Progreso</button>
+                    <button class="p-filter-chip" data-status="review">Revisión</button>
+                    <button class="p-filter-chip" data-status="done">Completado</button>
+                </div>
                 <div class="view-controls">
                     <button class="view-btn active" id="btnViewList"><i class="fas fa-list"></i> Lista</button>
                     <button class="view-btn" id="btnViewKanban"><i class="fas fa-columns"></i> Kanban</button>
                 </div>
-
-                <!-- Projects Table (List View) -->
-                <div class="premium-card" id="listViewContainer">
-                    <div class="table-responsive">
-                        <table class="designer-table">
-                            <thead>
-                                <tr>
-                                    <th>NOMBRE DEL PROYECTO</th>
-                                    <th>CATEGORÍA</th>
-                                    <th>FECHA LÍMITE</th>
-                                    <th>ESTADO</th>
-                                    <th style="text-align: center;">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody id="projectsTableBody">
-                                <!-- Skeleton loaders initially -->
-                                <tr><td><div class="skeleton skeleton-text"></div></td><td><div class="skeleton skeleton-text short"></div></td><td><div class="skeleton skeleton-text short"></div></td><td><div class="skeleton skeleton-text short"></div></td><td><div class="skeleton skeleton-text short" style="margin: 0 auto;"></div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Kanban Board View -->
-                <div class="kanban-board" id="kanbanViewContainer">
-                    <div class="kanban-column" data-status="pending">
-                        <div class="kanban-header">
-                            <span><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i> PENDIENTES</span>
-                            <span class="count" id="count-pending">0</span>
-                        </div>
-                        <div class="kanban-cards" id="kanban-pending"></div>
-                    </div>
-                    
-                    <div class="kanban-column" data-status="in-progress">
-                        <div class="kanban-header">
-                            <span><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i> EN PROGRESO</span>
-                            <span class="count" id="count-in-progress">0</span>
-                        </div>
-                        <div class="kanban-cards" id="kanban-in-progress"></div>
-                    </div>
-
-                    <div class="kanban-column" data-status="review">
-                        <div class="kanban-header">
-                            <span><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i> EN REVISIÓN</span>
-                            <span class="count" id="count-review">0</span>
-                        </div>
-                        <div class="kanban-cards" id="kanban-review"></div>
-                    </div>
-
-                    <div class="kanban-column" data-status="done">
-                        <div class="kanban-header">
-                            <span><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i> COMPLETADOS</span>
-                            <span class="count" id="count-done">0</span>
-                        </div>
-                        <div class="kanban-cards" id="kanban-done"></div>
-                    </div>
-                </div>
-
             </div>
-        </main>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="mobile-bottom-nav">
-            <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
-            <a href="proyectos.html" class="mobile-nav-item active"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
-            <a href="cursos.html" class="mobile-nav-item"><i class="fas fa-book-open"></i><span>Cursos</span></a>
-            <a href="reportes.html" class="mobile-nav-item"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
-            <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
-        </nav>
-    </div>
-
-    <!-- Modal Form (Hidden) -->
-    <div id="projectModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2 id="modalTitle">Nuevo Proyecto</h2>
-                <button id="closeModal" class="close-btn">&times;</button>
+            <!-- List View -->
+            <div class="premium-card" id="listViewContainer">
+                <div class="table-responsive">
+                    <table class="designer-table">
+                        <thead><tr><th>PROYECTO</th><th>CATEGORÍA</th><th>TUTOR</th><th>PRIORIDAD</th><th>ESTADO</th><th>FECHA</th><th style="text-align:center">ACCIONES</th></tr></thead>
+                        <tbody id="projectsTableBody">
+                            <tr><td colspan="7" style="padding:30px;text-align:center;color:var(--uts-text-muted)"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <form id="projectForm" class="premium-form">
-                <input type="hidden" id="projectId">
-                <div class="form-row">
-                    <div class="form-group"><label>Nombre del Proyecto</label><input type="text" id="projName" required></div>
-                    <div class="form-group">
-                        <label>Categoría Principal</label>
-                        <select id="projCategory" required>
-                            <option value="Web">Desarrollo Web</option>
-                            <option value="Móvil">Desarrollo Móvil</option>
-                            <option value="Investigación">Investigación Académica</option>
-                        </select>
-                    </div>
+
+            <!-- Kanban View -->
+            <div class="kanban-board" id="kanbanViewContainer" style="display:none">
+                <div class="kanban-column" data-status="pending">
+                    <div class="kanban-header"><span><i class="fas fa-circle" style="font-size:7px;margin-right:5px"></i>PENDIENTES</span><span id="count-pending">0</span></div>
+                    <div class="kanban-cards" id="kanban-pending"></div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Tutor</label><input type="text" id="projTutor" required></div>
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <select id="projStatus" required>
-                            <option value="pending">Pendiente</option>
-                            <option value="in-progress">En Progreso</option>
-                            <option value="review">En Revisión</option>
-                            <option value="done">Completado</option>
-                        </select>
-                    </div>
+                <div class="kanban-column" data-status="in-progress">
+                    <div class="kanban-header"><span><i class="fas fa-circle" style="font-size:7px;margin-right:5px"></i>EN PROGRESO</span><span id="count-in-progress">0</span></div>
+                    <div class="kanban-cards" id="kanban-in-progress"></div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Prioridad</label><select id="projPriority"><option>Baja</option><option selected>Media</option><option>Alta</option></select></div>
-                    <div class="form-group"><label>Fecha Límite</label><input type="date" id="projDueDate" required></div>
+                <div class="kanban-column" data-status="review">
+                    <div class="kanban-header"><span><i class="fas fa-circle" style="font-size:7px;margin-right:5px"></i>REVISIÓN</span><span id="count-review">0</span></div>
+                    <div class="kanban-cards" id="kanban-review"></div>
                 </div>
-                <div class="form-group"><label>Descripción</label><textarea id="projDesc" required></textarea></div>
-                <div class="modal-footer"><button type="button" class="btn-ghost" onclick="document.getElementById('projectModal').style.display='none'">Cancelar</button><button type="submit" class="btn-primary-glow">Guardar Proyecto</button></div>
-            </form>
+                <div class="kanban-column" data-status="done">
+                    <div class="kanban-header"><span><i class="fas fa-circle" style="font-size:7px;margin-right:5px"></i>COMPLETADOS</span><span id="count-done">0</span></div>
+                    <div class="kanban-cards" id="kanban-done"></div>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
+    <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
+        <a href="proyectos.html" class="mobile-nav-item active"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
+        <a href="cursos.html" class="mobile-nav-item"><i class="fas fa-book-open"></i><span>Cursos</span></a>
+        <a href="reportes.html" class="mobile-nav-item"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
+        <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
+    </nav>
+</div>
 
-    <script type="importmap">{"imports": {"firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js","firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"}}</script>
-    <script type="module" src="../js/app.js"></script>
+<!-- Modal -->
+<div id="projectModal" class="modal-overlay" style="display:none">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="modalTitle">Nuevo Proyecto</h2>
+            <button id="closeModal" class="close-btn">&times;</button>
+        </div>
+        <form id="projectForm">
+            <div class="form-row">
+                <div class="form-group"><label>Nombre del Proyecto</label><input type="text" id="projName" required placeholder="Ej: Sistema de Gestión Académica"></div>
+                <div class="form-group"><label>Categoría</label>
+                    <select id="projCategory">
+                        <option value="Web">Desarrollo Web</option>
+                        <option value="Móvil">Desarrollo Móvil</option>
+                        <option value="Investigación">Investigación Académica</option>
+                        <option value="Base de Datos">Base de Datos</option>
+                        <option value="Redes">Redes y Comunicaciones</option>
+                        <option value="IA">Inteligencia Artificial</option>
+                        <option value="Seguridad">Ciberseguridad</option>
+                        <option value="Cloud">Cloud Computing</option>
+                        <option value="Hardware">Electrónica / Hardware</option>
+                        <option value="Gestión">Gestión Empresarial</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Tutor / Director</label><input type="text" id="projTutor" placeholder="Nombre del tutor"></div>
+                <div class="form-group"><label>Estado</label>
+                    <select id="projStatus">
+                        <option value="pending">Pendiente</option>
+                        <option value="in-progress">En Progreso</option>
+                        <option value="review">En Revisión</option>
+                        <option value="done">Completado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Prioridad</label>
+                    <select id="projPriority"><option value="Baja">Baja</option><option value="Media" selected>Media</option><option value="Alta">Alta</option></select>
+                </div>
+                <div class="form-group"><label>Fecha Límite</label><input type="date" id="projDueDate"></div>
+            </div>
+            <div class="form-group"><label>Descripción</label><textarea id="projDesc" rows="3" placeholder="Breve descripción del proyecto..."></textarea></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-ghost" onclick="document.getElementById('projectModal').style.display='none'">Cancelar</button>
+                <button type="submit" class="btn-primary-glow">Guardar Proyecto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../js/proyectos.js"></script>
 </body>
 </html>

@@ -1,1 +1,7 @@
-/.env
+.env
+node_modules/
+dist/
+*.sqlite
+*.sqlite-journal
+.DS_Store
+example-backend/node_modules/

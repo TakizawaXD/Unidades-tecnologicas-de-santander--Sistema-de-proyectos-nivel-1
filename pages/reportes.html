@@ -3,86 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes PDF - UTS Enterprise</title>
+    <title>Reportes & Auditoría - UTS Enterprise</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png">
-    
-    <!-- jsPDF and AutoTable for professional PDF generation -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- QRCode for PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+    /* ── REPORT STATS ── */
+    .report-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:28px}
+    .rstat{background:var(--uts-white);border-radius:16px;padding:18px 16px;text-align:center;border:1px solid rgba(0,0,0,.04);box-shadow:0 2px 12px rgba(0,0,0,.04);transition:all .2s}
+    .rstat:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .rstat-num{font-size:28px;font-weight:800;display:block;margin-bottom:4px}
+    .rstat-lbl{font-size:11px;color:var(--uts-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
+    /* ── GRAD PROGRESS ── */
+    .grad-section{background:linear-gradient(135deg,#0f172a 0%,var(--uts-blue-dark) 100%);border-radius:22px;padding:32px;color:white;margin-bottom:28px;position:relative;overflow:hidden}
+    .grad-section::after{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(0,141,62,.15);border-radius:50%}
+    .grad-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+    .grad-title{font-size:22px;font-weight:800}
+    .grad-subtitle{font-size:14px;opacity:.7;margin-top:4px}
+    .grad-badge{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700}
+    .grad-ready{background:#10b981;color:white}
+    .grad-progress{background:#3b82f6;color:white}
+    .grad-early{background:#f59e0b;color:white}
+    .grad-progress-wrap{margin-bottom:12px}
+    .grad-progress-track{height:14px;background:rgba(255,255,255,.15);border-radius:7px;overflow:hidden;margin-bottom:8px}
+    .grad-progress-fill{height:100%;background:linear-gradient(90deg,#10b981,#06d6a0);border-radius:7px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+    .grad-progress-labels{display:flex;justify-content:space-between;font-size:12px;opacity:.7}
+
+    /* ── PDF BUTTONS GRID ── */
+    .pdf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:28px}
+    .pdf-card{background:var(--uts-white);border-radius:18px;padding:24px;border:1px solid var(--uts-gray-medium);transition:all .25s;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+    .pdf-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.1);border-color:var(--card-color,#004A87)}
+    .pdf-card-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px}
+    .pdf-card h4{font-size:15px;font-weight:800;margin-bottom:4px}
+    .pdf-card p{font-size:12px;color:var(--uts-text-muted);line-height:1.5}
+    .btn-pdf{border:none;padding:10px 22px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;color:white;width:100%;margin-top:4px}
+    .btn-pdf:hover{opacity:.88;transform:translateY(-1px)}
+
+    /* ── DATA TABLES ── */
+    .section-block{background:var(--uts-white);border-radius:20px;padding:24px;margin-bottom:22px;border:1px solid rgba(0,0,0,.04);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+    .section-block-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+    .section-block-header h3{font-size:17px;font-weight:800;color:var(--uts-text-main)}
+    .table-count{font-size:12px;background:var(--uts-gray-light);color:var(--uts-text-muted);padding:4px 12px;border-radius:20px;font-weight:600}
+
+    /* ── CHARTS ── */
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr 2fr;gap:20px;margin-bottom:22px}
+    .chart-card{background:var(--uts-white);border-radius:20px;padding:22px;border:1px solid rgba(0,0,0,.04);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+    .chart-card h4{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--uts-text-main)}
+    .chart-wrap{position:relative;height:220px}
+
+    @media(max-width:1100px){.charts-grid{grid-template-columns:1fr 1fr}.charts-grid .chart-card:last-child{grid-column:span 2}}
+    @media(max-width:768px){.report-stats{grid-template-columns:repeat(3,1fr)}.charts-grid{grid-template-columns:1fr}.charts-grid .chart-card:last-child{grid-column:span 1}}
+    @media(max-width:480px){.report-stats{grid-template-columns:repeat(2,1fr)}}
+    </style>
 </head>
 <body class="dashboard-body">
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="mainSidebar">
-            <div class="sidebar-header" style="text-align: center;">
-                <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
-            </div>
-            <ul class="nav-menu">
-                <div class="nav-group-label">MENÚ PRINCIPAL</div>
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
-                <li class="nav-item"><a href="proyectos.html" class="nav-link"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
-                <li class="nav-item"><a href="cursos.html" class="nav-link"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
-                <div class="nav-group-label" style="margin-top: 30px;">AUDITORÍA</div>
-                <li class="nav-item"><a href="reportes.html" class="nav-link active"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
-                <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
-            </ul>
-        </aside>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="mainSidebar">
+        <div class="sidebar-header" style="text-align:center">
+            <img src="https://www.uts.edu.co/sitio/wp-content/uploads/2019/10/Logo-UTS-1.png" alt="UTS" class="sidebar-logo-img">
+        </div>
+        <ul class="nav-menu">
+            <div class="nav-group-label">MENÚ PRINCIPAL</div>
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-grid-2"></i> <span>Vista General</span></a></li>
+            <li class="nav-item"><a href="proyectos.html" class="nav-link"><i class="fas fa-layer-group"></i> <span>Mis Proyectos</span></a></li>
+            <li class="nav-item"><a href="cursos.html" class="nav-link"><i class="fas fa-book-open"></i> <span>Catálogo Académico</span></a></li>
+            <div class="nav-group-label" style="margin-top:30px">AUDITORÍA</div>
+            <li class="nav-item"><a href="reportes.html" class="nav-link active"><i class="fas fa-file-invoice"></i> <span>Reportes PDF</span></a></li>
+            <li class="nav-item"><a href="configuracion.html" class="nav-link"><i class="fas fa-sliders-h"></i> <span>Ajustes</span></a></li>
+            <li class="nav-item" style="margin-top:30px"><a href="login.html" class="nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a></li>
+        </ul>
+    </aside>
 
-        <main class="main-content">
-            <header class="top-nav">
-                <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Buscar reportes..."></div>
-                <div class="top-nav-actions"><div class="user-profile-header"><div class="user-meta"><span id="userName" class="user-full-name">Estudiante UTS</span><span id="userCareer" class="user-role">Ingeniería de Sistemas</span></div><div class="avatar-circle" id="userInitial" role="img" aria-label="Avatar del usuario">U</div></div></div>
-            </header>
-
-            <div class="dashboard-section reveal-animation">
-                <div class="page-title-area" style="margin-bottom: 40px;">
-                    <h1 class="premium-title">Centro de Auditoría</h1>
-                    <p class="premium-subtitle">Genera documentos oficiales con firma digital (QR) y trazabilidad completa.</p>
-                </div>
-                
-                <div class="bento-grid">
-                    <div class="bento-item" style="grid-column: span 6; background: linear-gradient(135deg, #0f172a 0%, var(--uts-blue-dark) 100%); color: white; padding: 40px;">
-                        <i class="fas fa-file-signature" style="font-size: 40px; color: var(--uts-green); margin-bottom: 20px;"></i>
-                        <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 10px;">Reporte de Grado Consolidado</h3>
-                        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px; line-height: 1.6;">
-                            Genera un documento PDF oficial con el estado actual de tus 52 requisitos. Incluye un código QR único para validación por parte de Coordinación Académica.
-                        </p>
-                        <button id="btnGeneratePDF" class="btn-primary-glow" style="background: var(--uts-green); width: 100%;">
-                            <i class="fas fa-file-pdf" style="margin-right: 10px;"></i> Descargar PDF Oficial
-                        </button>
+    <main class="main-content">
+        <header class="top-nav">
+            <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Buscar en reportes..."></div>
+            <div class="top-nav-actions">
+                <div class="user-profile-header">
+                    <div class="user-meta">
+                        <span id="userName" class="user-full-name">Estudiante UTS</span>
+                        <span id="userCareer" class="user-role">Ingeniería</span>
                     </div>
-
-                    <div class="bento-item" style="grid-column: span 6; padding: 40px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;">
-                        <i class="fas fa-qrcode" style="font-size: 48px; color: var(--uts-text-muted); margin-bottom: 20px;"></i>
-                        <h3>Autenticidad Verificada</h3>
-                        <p style="color: var(--uts-text-muted); font-size: 14px;">El código QR generado en el documento enlaza directamente a tu perfil en Firestore, asegurando la inmutabilidad de tus proyectos.</p>
-                        <!-- Hidden div for QR generation -->
-                        <div id="qrcode" style="display: none;"></div>
-                    </div>
+                    <div class="avatar-circle" id="userInitial">U</div>
                 </div>
             </div>
-        </main>
+        </header>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="mobile-bottom-nav">
-            <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
-            <a href="proyectos.html" class="mobile-nav-item"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
-            <a href="cursos.html" class="mobile-nav-item"><i class="fas fa-book-open"></i><span>Cursos</span></a>
-            <a href="reportes.html" class="mobile-nav-item active"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
-            <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
-        </nav>
-    </div>
-    <script type="importmap">{"imports": {"firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js","firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"}}</script>
-    <script type="module" src="../js/app.js"></script>
+        <div class="dashboard-section reveal-animation">
+            <div class="page-title-area" style="margin-bottom:24px">
+                <h1 class="premium-title">Centro de Auditoría</h1>
+                <p class="premium-subtitle">Genera reportes PDF oficiales, analiza estadísticas y visualiza tu avance hacia la graduación.</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="report-stats">
+                <div class="rstat"><span class="rstat-num" id="rStatTotal" style="color:var(--uts-blue)">—</span><span class="rstat-lbl">Proyectos</span></div>
+                <div class="rstat"><span class="rstat-num" id="rStatDone" style="color:#10b981">—</span><span class="rstat-lbl">Completados</span></div>
+                <div class="rstat"><span class="rstat-num" id="rStatPending" style="color:#f59e0b">—</span><span class="rstat-lbl">Pendientes</span></div>
+                <div class="rstat"><span class="rstat-num" id="rStatPct" style="color:var(--uts-green)">—</span><span class="rstat-lbl">Avance</span></div>
+                <div class="rstat"><span class="rstat-num" id="rStatCourses" style="color:#8b5cf6">—</span><span class="rstat-lbl">Cursos ✓</span></div>
+                <div class="rstat"><span class="rstat-num" id="rStatHours" style="color:#ec4899">—</span><span class="rstat-lbl">Horas</span></div>
+            </div>
+
+            <!-- Graduation progress -->
+            <div class="grad-section">
+                <div class="grad-header">
+                    <div>
+                        <div class="grad-title">🎓 Avance hacia la Graduación</div>
+                        <div class="grad-subtitle">Requisito: 52 proyectos académicos completados</div>
+                    </div>
+                    <span id="gradStatus" class="grad-badge grad-early">⏳ Cargando...</span>
+                </div>
+                <div class="grad-progress-wrap">
+                    <div class="grad-progress-track">
+                        <div id="gradProgressFill" class="grad-progress-fill" style="width:0%"></div>
+                    </div>
+                    <div class="grad-progress-labels">
+                        <span>0 proyectos</span>
+                        <span id="gradPct" style="font-weight:700;color:white">0%</span>
+                        <span>52 proyectos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Generation Cards -->
+            <div class="section-block">
+                <div class="section-block-header">
+                    <h3><i class="fas fa-file-pdf" style="color:#ef4444;margin-right:8px"></i>Generar Documentos PDF</h3>
+                </div>
+                <div class="pdf-grid">
+                    <div class="pdf-card" style="--card-color:#004A87">
+                        <div class="pdf-card-icon" style="background:#dbeafe;color:#1d4ed8"><i class="fas fa-layer-group"></i></div>
+                        <div>
+                            <h4>Reporte de Proyectos</h4>
+                            <p>Tabla completa de todos tus proyectos con estado, categoría, tutor y fecha.</p>
+                        </div>
+                        <button id="btnPDFProyectos" class="btn-pdf" style="background:#004A87"><i class="fas fa-download"></i> Descargar PDF</button>
+                    </div>
+                    <div class="pdf-card" style="--card-color:#008D3E">
+                        <div class="pdf-card-icon" style="background:#d1fae5;color:#065f46"><i class="fas fa-book-open"></i></div>
+                        <div>
+                            <h4>Reporte de Cursos</h4>
+                            <p>Registro de cursos inscritos, progreso por unidad y horas de formación.</p>
+                        </div>
+                        <button id="btnPDFCursos" class="btn-pdf" style="background:#008D3E"><i class="fas fa-download"></i> Descargar PDF</button>
+                    </div>
+                    <div class="pdf-card" style="--card-color:#8b5cf6">
+                        <div class="pdf-card-icon" style="background:#ede9fe;color:#7c3aed"><i class="fas fa-file-signature"></i></div>
+                        <div>
+                            <h4>Reporte Integral</h4>
+                            <p>Documento unificado con proyectos y formación complementaria en un solo PDF.</p>
+                        </div>
+                        <button id="btnPDFCompleto" class="btn-pdf" style="background:#8b5cf6"><i class="fas fa-download"></i> Descargar PDF</button>
+                    </div>
+                    <div class="pdf-card" style="--card-color:#f59e0b">
+                        <div class="pdf-card-icon" style="background:#fef3c7;color:#92400e"><i class="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <h4>Certificado de Avance</h4>
+                            <p>Documento oficial de grado con barra de progreso, firma y código de verificación único.</p>
+                        </div>
+                        <button id="btnPDFGrado" class="btn-pdf" style="background:#f59e0b"><i class="fas fa-certificate"></i> Generar Certificado</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h4><i class="fas fa-chart-pie" style="color:var(--uts-blue);margin-right:6px"></i>Estado de Proyectos</h4>
+                    <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h4><i class="fas fa-chart-bar" style="color:var(--uts-green);margin-right:6px"></i>Por Categoría</h4>
+                    <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h4><i class="fas fa-chart-line" style="color:#8b5cf6;margin-right:6px"></i>Actividad Mensual</h4>
+                    <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Projects Table -->
+            <div class="section-block">
+                <div class="section-block-header">
+                    <h3><i class="fas fa-list" style="color:var(--uts-blue);margin-right:8px"></i>Detalle de Proyectos</h3>
+                    <span class="table-count" id="projCount">Cargando...</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="designer-table">
+                        <thead><tr><th>#</th><th>Nombre</th><th>Categoría</th><th>Tutor</th><th>Estado</th><th>Fecha</th></tr></thead>
+                        <tbody id="rProjectsBody">
+                            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--uts-text-muted)"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Courses Table -->
+            <div class="section-block">
+                <div class="section-block-header">
+                    <h3><i class="fas fa-graduation-cap" style="color:var(--uts-green);margin-right:8px"></i>Formación Complementaria</h3>
+                    <span class="table-count" id="courseCount">Cargando...</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="designer-table">
+                        <thead><tr><th>Curso</th><th>Categoría</th><th>Progreso</th><th>Estado</th></tr></thead>
+                        <tbody id="rCoursesBody">
+                            <tr><td colspan="4" style="text-align:center;padding:30px;color:var(--uts-text-muted)"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <nav class="mobile-bottom-nav">
+        <a href="dashboard.html" class="mobile-nav-item"><i class="fas fa-grid-2"></i><span>Inicio</span></a>
+        <a href="proyectos.html" class="mobile-nav-item"><i class="fas fa-layer-group"></i><span>Proyectos</span></a>
+        <a href="cursos.html" class="mobile-nav-item"><i class="fas fa-book-open"></i><span>Cursos</span></a>
+        <a href="reportes.html" class="mobile-nav-item active"><i class="fas fa-file-invoice"></i><span>Reportes</span></a>
+        <a href="configuracion.html" class="mobile-nav-item"><i class="fas fa-sliders-h"></i><span>Ajustes</span></a>
+    </nav>
+</div>
+
+<script src="../js/reportes.js"></script>
 </body>
 </html>
